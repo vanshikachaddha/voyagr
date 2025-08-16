@@ -8,12 +8,15 @@ from app.db.database import get_db
 from app.services.repo import UsersRepo, BaseRepo
 from app.core.security import hash_password, verify_password
 from app.core.jwt import JWTRepo
+import bcrypt
+
 
 router = APIRouter(
     tags = {"Authentication"}
 )
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+bcrypt.__about__ = bcrypt
 
 # Register
 @router.post("/signup")
@@ -38,12 +41,17 @@ async def login(request: Login, db: Session = Depends(get_db)):
     try: 
         _user = UsersRepo.find_username(db, User, request.username)
 
-        if not pwd_context.verify(request.password, _user.password):
+        if not pwd_context.verify(request.password, _user.hashed_password):
             return ResponseSchema(code="400", status="Bad Request", message="Invalid Password").dict(exclude_none = True)
         
         token = JWTRepo.generate_token({'sub': _user.username})
-        return ResponseSchema(code="200", status="Ok", message="Success Saved Data", result= TokenResponse(access_token = None, token_type = "bearer").dict(exclude_none = True))
-
+        return ResponseSchema(
+            code="200",
+            status="Ok",
+            message="Login Success",
+            result=TokenResponse(access_token=token, token_type="bearer").dict(exclude_none=True)
+        )
+    
     except Exception as error:
         error_message = str(error.args)
         print(error_message)
