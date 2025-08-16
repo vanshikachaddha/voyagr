@@ -1,5 +1,5 @@
 from typing import Generic, Optional, TypeVar
-from pydantic.generics import GenericModel
+from pydantic import BaseModel
 from pydantic import BaseModel, Field
 
 T = TypeVar("T")
@@ -16,6 +16,16 @@ class Register(BaseModel):
     first_name: str
     last_name: str
     email: str
+
+class UserOut(BaseModel):
+    id: int
+    username: str
+    email: str
+    first_name: str
+    last_name: str
+
+    class Config:
+        from_attributes = True  
 
 # Response Model
 class ResponseSchema(BaseModel):

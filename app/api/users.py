@@ -6,8 +6,8 @@ from app.schemas.user import Register, Login, ResponseSchema, TokenResponse
 from app.models.user import User
 from app.db.database import get_db
 from app.services.repo import UsersRepo, BaseRepo
-from app.core.config import hash_password, verify_password
-from app.core.jst import JWTRepo
+from app.core.security import hash_password, verify_password
+from app.core.jwt import JWTRepo
 
 router = APIRouter(
     tags = {"Authentication"}
@@ -22,7 +22,7 @@ async def signup(request: Register, db: Session = Depends(get_db)):
         _user = User (
             # Insert Data
             username = request.username,
-            password = request.password,
+            hashed_password = hash_password(request.password),
             first_name = request.first_name,
             last_name = request.last_name,
             email = request.email)

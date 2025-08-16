@@ -1,7 +1,7 @@
 from fastapi import FastAPI
+from app.api import users   # 👈 import your users router file
 
 app = FastAPI()
 
-@app.get("/")
-async def root():
-    return "Hello Word"
+# register router
+app.include_router(users.router, prefix="/auth")
