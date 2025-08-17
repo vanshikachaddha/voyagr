@@ -1,4 +1,4 @@
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String
 from .base import Base
 
@@ -10,3 +10,5 @@ class User(Base):
     email = Column(String, nullable = False, unique=True)
     username = Column(String, nullable = False, unique=True)
     hashed_password = Column(String, nullable=False)
+
+    trip = relationship("Trip", back_populates="user")

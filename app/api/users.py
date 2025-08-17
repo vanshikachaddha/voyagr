@@ -44,7 +44,7 @@ async def login(request: Login, db: Session = Depends(get_db)):
         if not pwd_context.verify(request.password, _user.hashed_password):
             return ResponseSchema(code="400", status="Bad Request", message="Invalid Password").dict(exclude_none = True)
         
-        token = JWTRepo.generate_token({'sub': _user.username})
+        token = JWTRepo.generate_token({'sub': _user.id})
         return ResponseSchema(
             code="200",
             status="Ok",
