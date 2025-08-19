@@ -1,24 +1,40 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from passlib.context import CryptContext
 
-from app.schemas.trip import Trip, CreateTrip, DetailsTrip
-from app.models.user import User
+from app.schemas.trip import CreateTrip, TripResponse
+from app.models.trip import Trip
 from app.db.database import get_db
-from app.services.repo import UsersRepo, BaseRepo
-from app.core.security import hash_password, verify_password
+from app.services.repo import BaseRepo
 from app.core.jwt import JWTRepo
-import bcrypt
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 router = APIRouter(
-    tags = {"Trip Creator"}
+    tags = {"Trips"}
 )
 
 # Create a Trip
-@router.post("/create-trip")
-async def create_trip(trip: Trip,  db: Session = Depends(get_db)):
-    
+@router.post("/create-trip", response_model=TripResponse)
+async def create_trip(request: CreateTrip,  db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+
+    payload = JWTRepo.decode_token(token)
+
+    if not payload:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+    user_id = int(payload.get("sub"))
+    _trip = Trip(
+        # Insert Data
+        country = request.country,
+        city = request.city,
+        start_date = request.start_date,
+        end_date = request.end_date,
+        user_id = user_id
+    )
+
+    BaseRepo.insert(db, _trip)
+
+    return _trip
 
 
 

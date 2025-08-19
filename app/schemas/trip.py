@@ -6,18 +6,20 @@ from datetime import date
 T = TypeVar("T")
 
 # Shared Characteristics
-class Trip(BaseModel):
+class TripBase(BaseModel):
     country: str
     city: str
     start_date: date
     end_date: date
 
 # Create a Trip
-class CreateTrip(Trip):
+class CreateTrip(TripBase):
     pass
 
 # Response Model
-class DetailsTrip(Trip):
+class TripResponse(TripBase):
+    id: int
     user_id: int
 
-    
+    class Config:
+        from_attributes = True  

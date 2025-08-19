@@ -4,6 +4,7 @@ from .base import Base
 
 class Trip(Base):
     __tablename__ = "trips"
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable = False)
     country = Column(String, nullable = False)
     city = Column(String, nullable = False)
     start_date = Column(DATE, nullable = False)
