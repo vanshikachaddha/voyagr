@@ -36,5 +36,21 @@ async def create_trip(request: CreateTrip,  db: Session = Depends(get_db), token
 
     return _trip
 
+# Get Trip Details
+@router.post("/list-trip", response_model = list[TripResponse])
+async def get_trip_details(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    payload = JWTRepo.decode_token(token)
+
+    if not payload:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail = "Invalid token")
+    
+    user_id = int(payload.get("sub"))
+
+    return db.query(Trip).filter(Trip.user_id == user_id).all()
+
+
+
+
+
 
 
